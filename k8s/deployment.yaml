@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kitchen-service
-  namespace: default
   labels:
     app: kitchen-service
 spec:
