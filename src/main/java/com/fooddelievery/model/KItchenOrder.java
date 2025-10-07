@@ -1,5 +1,6 @@
 package com.fooddelievery.model;
 
+/*
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -10,7 +11,10 @@ import java.time.LocalDateTime;
 @Table(name = "kitchen_orders")
 // Important: Your class must have a default (no-arg) constructor for JSON deserialization!
 @Data
+*/
+
 public class KItchenOrder {
+/*
     @Id
     private String orderId; // This comes from the OrderCreatedEvent
 
@@ -34,6 +38,7 @@ public class KItchenOrder {
         this.status = "PENDING";
     }
     // ... (getters and setters for all fields)
+*/
 
 
 }

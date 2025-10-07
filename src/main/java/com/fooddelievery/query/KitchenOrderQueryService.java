@@ -9,12 +9,13 @@ import java.util.List;
 @Service
 public class KitchenOrderQueryService {
 
-    private final KitchenOrderRepository repository;
+    /*private final KitchenOrderRepository repository;
 
     public KitchenOrderQueryService(KitchenOrderRepository repository) {
         this.repository = repository;
     }
-
+*/
+    /*
     // Get all orders in the kitchen (for a queue view)
     public List<KItchenOrder> getAllOrders() {
         return repository.findAll(); // Uses JpaRepository's built-in method
@@ -30,5 +31,5 @@ public class KitchenOrderQueryService {
     public List<KItchenOrder> getOrdersByStatus(String status) {
         // This requires a custom method in the Repository interface
         return repository.findByStatus(status);
-    }
+    }*/
 }

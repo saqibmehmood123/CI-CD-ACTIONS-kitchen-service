@@ -12,14 +12,24 @@ import java.util.List;
 @RequestMapping("/kitchen/orders")
 public class KitchenOrderQueryController {
 
+    @GetMapping
+    public String getAllOrders() {
+        return "  kitchen order is working ";
+    }
+
+
+
+/*
     private final KitchenOrderQueryService queryService;
 
     public KitchenOrderQueryController(KitchenOrderQueryService queryService) {
         this.queryService = queryService;
     }
+*/
 
     // Get all orders in the kitchen queue
     // GET http://localhost:8082/kitchen/orders
+/*
     @GetMapping
     public List<KItchenOrder> getAllOrders() {
         return queryService.getAllOrders();
@@ -38,4 +48,7 @@ public class KitchenOrderQueryController {
     public List<KItchenOrder> getOrdersByStatus(@PathVariable String status) {
         return queryService.getOrdersByStatus(status);
     }
+*/
+
+
 }

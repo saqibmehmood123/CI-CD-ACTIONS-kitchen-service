@@ -8,7 +8,7 @@ import com.fooddelievery.repository.KitchenOrderRepository;
 //import org.springframework.kafka.core.KafkaTemplate;
 //import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+//import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,18 +16,18 @@ import java.util.UUID;
 @Service
 public class KitchenOrderCommandService {
 
-    private final KitchenOrderRepository repository;
+  ///  private final KitchenOrderRepository repository;
    // private final KafkaTemplate<String, Object> kafkaTemplate; // Inject KafkaTemplate
 
-    public KitchenOrderCommandService(KitchenOrderRepository repository
+    /*public KitchenOrderCommandService(KitchenOrderRepository repository
     //                                  KafkaTemplate<String, Object> kafkaTemplate
     ) {
         this.repository = repository;
     ///    this.kafkaTemplate = kafkaTemplate;
     }
-
+*/
    /// @KafkaListener(topics = "order-created-topic", groupId = "kitchen-service-group")
-    @Transactional
+  /*  @Transactional
     public void handleOrderCreated(OrderCreatedEvent event) {
         System.out.println("Received order for kitchen: " + event.getOrderId());
         System.out.println("   ----------------------   this  is kitchen miocroservice    -------------------------- ");
@@ -52,12 +52,12 @@ public class KitchenOrderCommandService {
         repository.save(kitchenOrder); // Update the status
 
         // 4. Publish the new event to the "order-prepared-topic"
-/*
+*//*
         OrderPreparedEvent preparedEvent = new OrderPreparedEvent(
                 event.getOrderId(),
                 "READY_FOR_DELIVERY"
         );
-*/
+*//*
 
 
         OrderCreatedEvent  orderCreatedEvent = preparedOrderCreated(event);
@@ -83,5 +83,5 @@ private  OrderCreatedEvent preparedOrderCreated(OrderCreatedEvent event)
     event.setEventId(UUID.randomUUID().toString());
     return event;
 }
-
+*/
 }
