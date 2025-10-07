@@ -1,34 +1,25 @@
-name: Deploy to EKS
+name: Deploy Kitchen Service to EKS
 
 on:
   push:
     branches: [ main ]
 
 env:
-  AWS_REGION: eu-west-3
-  ECR_REPOSITORY: food-delivery/order-service
-  EKS_CLUSTER: food-delivery-prod
-  NAMESPACE: order-service
+  AWS_REGION: "eu-west-3"
+  ECR_REPOSITORY: "food-delivery/kitchen-service"
+  EKS_CLUSTER_NAME: "fooddelivery-prod-cluster"
+  K8S_NAMESPACE: "default"
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-
-    - name: Build with Maven
-      run: mvn clean package -U
+    - name: Checkout
+      uses: actions/checkout@v3
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -36,32 +27,32 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
+      uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, tag, and push image to ECR
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        # Update deployment with new image
-        sed -i "s|image:.*|image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" k8s/order-service-deployment.yaml
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-    - name: Update kubeconfig
-      run: aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
-
-    - name: Deploy to EKS
+    - name: Update k8s manifest with new image
       run: |
-        kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
-        kubectl label namespace $NAMESPACE eks.amazonaws.com/compute-type=fargate --overwrite
-        kubectl apply -f k8s/ -n $NAMESPACE --validate=false
-        kubectl rollout status deployment/order-service -n $NAMESPACE --timeout=600s
-        kubectl get pods -n $NAMESPACE
-        kubectl get ingress -n $NAMESPACE
+        sed -i 's|884583303090.dkr.ecr.eu-west-3.amazonaws.com/food-delivery/kitchen-service:latest|${{ steps.build-image.outputs.image }}|' k8s/deploy.yaml
 
-    - name: Get ALB URL
-      run: |
-        echo "Your application is deployed at:"
-        kubectl get ingress order-service-ingress -n $NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
-        echo ""
+    - name: Deploy to EKS cluster
+      uses: aws-actions/amazon-eks-deploy-and-wait@v1
+      with:
+        cluster-name: ${{ env.EKS_CLUSTER_NAME }}
+        wait: true
+        manifest-file: k8s/deploy.yaml
+
+    - name: Deploy Service to EKS
+      uses: aws-actions/amazon-eks-deploy-and-wait@v1
+      with:
+        cluster-name: ${{ env.EKS_CLUSTER_NAME }}
+        wait: true
+        manifest-file: k8s/service.yaml
