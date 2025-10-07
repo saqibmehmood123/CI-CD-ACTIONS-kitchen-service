@@ -56,3 +56,13 @@ jobs:
         kubectl label namespace $NAMESPACE eks.amazonaws.com/compute-type=fargate --overwrite
         kubectl apply -f k8s/ -n $NAMESPACE --validate=false
         kubectl rollout status deployment/kitchen-service -n $NAMESPACE --timeout=600s
+            kubectl get pods -n $NAMESPACE
+        kubectl get ingress -n $NAMESPACE
+
+    - name: Get ALB URL
+      run: |
+        echo "Your application is deployed at:"
+        kubectl get ingress kitchen-service-ingress -n $NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+        echo ""
+
+
