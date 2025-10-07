@@ -43,16 +43,14 @@ jobs:
       run: |
         sed -i 's|884583303090.dkr.ecr.eu-west-3.amazonaws.com/food-delivery/kitchen-service:latest|${{ steps.build-image.outputs.image }}|' k8s/deploy.yaml
 
-    - name: Deploy to EKS cluster
-      uses: aws-actions/amazon-eks-deploy-and-wait@v1
+    - name: Configure kubectl for EKS
+      uses: aws-actions/amazon-eks-set-kubectl@v1
       with:
         cluster-name: ${{ env.EKS_CLUSTER_NAME }}
-        wait: true
-        manifest-file: k8s/deploy.yaml
+        aws-region: ${{ env.AWS_REGION }}
 
-    - name: Deploy Service to EKS
-      uses: aws-actions/amazon-eks-deploy-and-wait@v1
-      with:
-        cluster-name: ${{ env.EKS_CLUSTER_NAME }}
-        wait: true
-        manifest-file: k8s/service.yaml
+    - name: Deploy to EKS cluster
+      run: |
+        kubectl apply -f k8s/deploy.yaml
+        kubectl apply -f k8s/service.yaml
+        kubectl rollout status deployment/kitchen-service --timeout=300s
