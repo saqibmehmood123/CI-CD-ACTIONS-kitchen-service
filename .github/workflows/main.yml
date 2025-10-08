@@ -8,7 +8,7 @@ env:
   AWS_REGION: eu-west-3
   ECR_REPOSITORY: food-delivery/kitchen-service
   EKS_CLUSTER: food-delivery-prod
-  NAMESPACE: kitchen-service
+  NAMESPACE: default  # Changed to default
 
 jobs:
   deploy:
@@ -45,21 +45,13 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        sed -i "s|image:.*|image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" k8s/deployment.yaml
+        sed -i "s|image:.*|image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" k8s/deploy.yaml  # Fixed filename
 
     - name: Update kubeconfig
       run: aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
 
     - name: Deploy to EKS
       run: |
-        kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
-        kubectl label namespace $NAMESPACE eks.amazonaws.com/compute-type=fargate --overwrite
-        kubectl apply -f k8s/ -n $NAMESPACE --validate=false
-        
-        # Wait for pods with debug info
-        echo "=== Waiting for pods to start ==="
-        timeout 300s bash -c 'until kubectl get pods -n $NAMESPACE -l app=kitchen-service | grep -q "Running"; do sleep 10; kubectl get pods -n $NAMESPACE; done'
-        
-        echo "=== Final pod status ==="
-        kubectl get pods -n $NAMESPACE
-        kubectl describe pods -n $NAMESPACE -l app=kitchen-service                    
+        kubectl apply -f k8s/ --validate=false  # Removed namespace since using default
+        kubectl rollout status deployment/kitchen-service --timeout=600s
+        kubectl get pods -l app=kitchen-service

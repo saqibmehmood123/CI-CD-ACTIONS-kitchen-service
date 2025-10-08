@@ -9,14 +9,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/kitchen/orders")
+
+@RequestMapping("/kitchen")
 public class KitchenOrderQueryController {
 
-    @GetMapping
-    public String getAllOrders() {
-        return "  kitchen order is working ";
-    }
 
+    @GetMapping("/string")
+        public String getString() {
+            return "  kitchen order is working ";
+        }
 
 
 /*

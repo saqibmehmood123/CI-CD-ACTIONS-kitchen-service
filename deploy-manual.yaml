@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kitchen-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kitchen-service
+  template:
+    metadata:
+      labels:
+        app: kitchen-service
+    spec:
+      containers:
+      - name: kitchen-service
+        image: 884583303090.dkr.ecr.eu-west-3.amazonaws.com/food-delivery/kitchen-service:latest
+        ports:
+        - containerPort: 8082
