@@ -45,7 +45,7 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        sed -i "s|image:.*|image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" k8s/deploy.yaml
+        sed -i "s|image:.*|image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" k8s/deployment.yaml
 
     - name: Update kubeconfig
       run: aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
@@ -62,4 +62,4 @@ jobs:
         
         echo "=== Final pod status ==="
         kubectl get pods -n $NAMESPACE
-        kubectl describe pods -n $NAMESPACE -l app=kitchen-service
+        kubectl describe pods -n $NAMESPACE -l app=kitchen-service                    
