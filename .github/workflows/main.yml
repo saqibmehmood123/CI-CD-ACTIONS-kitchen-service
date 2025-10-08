@@ -55,6 +55,6 @@ jobs:
         kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
         kubectl label namespace $NAMESPACE eks.amazonaws.com/compute-type=fargate --overwrite
         kubectl apply -f k8s/ -n $NAMESPACE --validate=false
-        kubectl rollout status deployment/kitchen-service -n $NAMESPACE --timeout=600s
+        kubectl rollout status deployment/kitchen-service -n $NAMESPACE --timeout=1200s
 
 
